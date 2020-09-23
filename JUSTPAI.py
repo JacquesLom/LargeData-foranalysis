@@ -2,7 +2,7 @@
 """
 Created on Wed Jun 24 14:37:09 2020
 
-@author: Jacques
+@author: Brent Kotzee
 """
 
 import pandas as pd
@@ -12,15 +12,16 @@ from pandas.core.common import flatten
 import datetime
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
-from fucs import GETPMI,GetData, GetJobs, GetCum, GetPAI
+from fucs import GETPMI,GetData, GetJobs, GetCum, GetPAI,GetAVA
 
-def JustPai(df,orginIN,destinationIN,timeIN,i):
+def JustPai(df,orginIN,destinationIN,timeIN,i,name):
     stop = 1
     
     while stop < 3:
         pmi = []
         Accs = []
         OriginToAll = []
+        AV=[]
         if stop == 1:        
             print(df)
         #--------------------------------------------------------------------------
@@ -39,10 +40,7 @@ def JustPai(df,orginIN,destinationIN,timeIN,i):
             print( sorted( list( dict.fromkeys( df["Time"].tolist() ) ) ) )
             timeIN = list(re.split('[,,\s]',(input("Enter a multiple value: "))))
             """
-            print("Please select the type of Opportunity in the TAZ Destination:\n")
-            GetJobs()
-            
-            name = input()
+
         """
         else:
             OrginQ = input("new orgin Type Y or N ?")
@@ -73,7 +71,7 @@ def JustPai(df,orginIN,destinationIN,timeIN,i):
                 timeIN = list(dict.fromkeys(timeIN))
         """
         Accs = Accs + GetData(orginIN, timeIN[i], destinationIN, df,name)
-        
+        AV = AV + GetAVA(orginIN, timeIN[i], destinationIN, df)
         pai = GetPAI(orginIN, timeIN[i], destinationIN, df, name)
         Hour=[]
         (h,m,s) = timeIN[i].split(':')
@@ -102,4 +100,4 @@ def JustPai(df,orginIN,destinationIN,timeIN,i):
         print("DONE")
         
         stop = 3
-        return pai,Accs,Hour
+        return pai,Accs,Hour,AV

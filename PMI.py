@@ -2,7 +2,7 @@
 """
 Created on Tue Jun 23 17:40:46 2020
 
-@author: Jacques
+@author: Brent Kotzee
 """
 import pandas as pd
 import numpy as np
@@ -11,24 +11,24 @@ from pandas.core.common import flatten
 import datetime
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
-from fucs import GETPMI,GetData, GetJobs, GetCum, GetPAI
+from fucs import GETPMI,GetData, GetJobs, GetCum, GetPAI,GetAVA,GetaccC
 #takes the data thats availiable to print and takes the orgin and destination and time  
 #thse values can be set to defualt
 #name from jobs input
-def PMI(df,orginIN,destinationIN,timeIN,i):
+def PMI(df,orginIN,destinationIN,timeIN,i,name):
     stop = 1
     
     while stop < 3:
         pmi = []
         Accs = []
+        AccC = []
         OriginToAll = []
-        print("Please select the type of Opportunity in the TAZ Destination:\n")
-        GetJobs()
-        name = input()        
+        AV = []
+      
         
-        data= df.loc[(df["Name"].isin( [str(orginIN) + " - "+ str(destinationIN)] ))   & (df["Time"].isin([str(timeIN[i] ) ] ) )]
+        data= df.loc[(df["Origin"].isin( [str(orginIN)])) & (df["Dest"].isin( [str(destinationIN)] ))   & (df["Time"].isin([str(timeIN[i] ) ] ) )]
         print(data)
-        pmi.append(GETPMI(data["Total_Leng"].values[0], data["Total_Trav"].values[0]))
+        pmi.append(GETPMI(data["Total_Trav"].values[0],data["Shape_Leng"].values[0] ))
     #calculates the PMI form the orgin to all other destincation for the users given input time or times
         """
         print("Please type in the TimeOfDay you want for cum anal (hh:mm:ss):\n")
@@ -40,14 +40,16 @@ def PMI(df,orginIN,destinationIN,timeIN,i):
             timeI =timeI.split(",")
         for i in range(len(timeI)):  
              sub = df.loc[df["Origin"].isin([str(orginIN)]) &(df["Time"].isin([timeI[i]]))]
+             data= df.loc[(df["Origin"].isin( [str(orginIN)])) & (df["Dest"].isin( [str(destinationIN)] ))   & (df["Time"].isin([str(timeI[i] ) ] ) )]
              t = sub['Total_Trav'].sum()
-             d = sub['Total_Leng'].sum()
+             d = sub['Shape_Leng'].sum()
              OriginToAll.append(GETPMI(t, d))
+             AV.append((data[ "Total_Trav" ].values[0]))
                 
-        Accs = Accs + GetData(orginIN, timeIN, destinationIN,df,name)
-
+        Accs = Accs + GetData(orginIN, timeIN, destinationIN,df,name) 
+        AccC = AccC + GetaccC(orginIN, timeIN, destinationIN,df,name)
         
-        #the graaphing section
+        #the graphing section
         Hour=[]
         for i in range(len(timeIN)):
             (h,m,s) = timeIN[i].split(':')
@@ -129,7 +131,7 @@ def PMI(df,orginIN,destinationIN,timeIN,i):
         """
         
         print(pmi)
-        return Hour,OriginToAll,asscum,Accs,pai,pmi
+        return Hour,OriginToAll,asscum,Accs,pai,pmi,AV,Accs
         stop = 3
         
         if stop == 1:        

@@ -2,7 +2,7 @@
 """
 Created on Wed Jun 24 15:25:01 2020
 
-@author: Jacques
+@author: Brent Kotzee
 """
 import pandas as pd
 import numpy as np
@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
 from fucs import GETPMI,GetData, GetJobs, GetCum, GetPAI
 
-def both(df,orginIN,destinationIN,timeIN,i):
+def both(df,orginIN,destinationIN,timeIN,i,name):
     stop = 1
     
     while stop < 3:
@@ -38,9 +38,7 @@ def both(df,orginIN,destinationIN,timeIN,i):
             print( sorted( list( dict.fromkeys( df["Time"].tolist() ) ) ) )
             timeIN = list(re.split('[,,\s]',(input("Enter a multiple value: "))))
             """
-            print("Please select the type of Opportunity in the TAZ Destination:\n")
-            GetJobs()
-            name = input()
+
         """
         else:
             OrginQ = input("new orgin Type Y or N ?")
@@ -76,7 +74,7 @@ def both(df,orginIN,destinationIN,timeIN,i):
         timeIN = [timeIN[i]]
         for j in range(len(timeIN)):
             data= df.loc[(df["Name"].isin( [str(orginIN) + " - "+ str(destinationIN)] ))   & (df["Time"].isin([str(timeIN[j] ) ] ) )]
-            pmi.append(GETPMI(data["Total_Leng"].values[0], data["Total_Trav"].values[0]))
+            pmi.append(GETPMI(data["Shape_Leng"].values[0], data["Total_Trav"].values[0]))
     #calculates the PMI form the orgin to all other destincation for the users given input time or times
         """
         print("Please type in the TimeOfDay you want for cum anal (hh:mm:ss):\n")
@@ -86,7 +84,7 @@ def both(df,orginIN,destinationIN,timeIN,i):
         for i in range(len(timeI)):  
              sub = df.loc[df["Origin"].isin([str(orginIN)]) &(df["Time"].isin([timeI[i]]))]
              t = sub['Total_Trav'].sum()
-             d = sub['Total_Leng'].sum()
+             d = sub['Shape_Leng'].sum()
              OriginToAll.append(GETPMI(t, d))
                 
         Accs = Accs + GetData(orginIN, timeIN, destinationIN,df,name)
